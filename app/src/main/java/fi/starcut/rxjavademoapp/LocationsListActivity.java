@@ -49,6 +49,8 @@ public class LocationsListActivity extends AppCompatActivity {
 
     private void loadData() {
 
+        //TODO: Implement Observalbe
+        //1. Start with Observable.fromCallable
 
     }
 
