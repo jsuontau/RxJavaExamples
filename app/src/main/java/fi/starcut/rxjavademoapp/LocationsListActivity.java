@@ -49,6 +49,34 @@ public class LocationsListActivity extends AppCompatActivity {
 
     private void loadData() {
 
+        Observable<Pair<Location, WeatherObservation>> observable =
+                Observable.fromCallable(
+                        new Callable<List<Location>>() {
+                            @Override
+                            public List<Location> call() throws Exception {
+                                return DataProvider.getFavoriteLocations();
+                            }
+                        }).flatMap(
+                        new Function<List<Location>, ObservableSource<Location>>() {
+                            @Override
+                            public ObservableSource<Location> apply(@NonNull List<Location> locations)
+                                    throws Exception {
+                                return Observable.fromIterable(locations);
+                            }
+                        }).map(
+                        new Function<Location, Pair<Location, WeatherObservation>>() {
+                            @Override
+                            public Pair<Location, WeatherObservation> apply(@NonNull Location location)
+                                    throws Exception {
+                                WeatherObservation observation = WeatherAPI
+                                        .getWeatherObservation(location.getLat(), location.getLon());
+                                return new Pair<>(location, observation);
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+
+        subscribe(observable);
 
     }
 
